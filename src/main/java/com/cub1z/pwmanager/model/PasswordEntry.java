@@ -9,7 +9,6 @@ public class PasswordEntry implements Serializable {
 
     private final String serviceName;
     private final char[] encryptedPassword;
-    private final byte[] salt;
     private final Date createdAt;
     private Date updatedAt;
     private Date lastAccessedAt;
@@ -17,7 +16,6 @@ public class PasswordEntry implements Serializable {
     public PasswordEntry(String serviceName, char[] encryptedPassword, byte[] salt) {
         this.serviceName = serviceName;
         this.encryptedPassword = encryptedPassword;
-        this.salt = salt;
 
         // Initialize timestamps to the current date
         Date currentDate = new Date();
@@ -34,10 +32,6 @@ public class PasswordEntry implements Serializable {
 
     public char[] getEncryptedPassword() {
         return Arrays.copyOf(encryptedPassword, encryptedPassword.length);
-    }
-
-    public byte[] getSalt() {
-        return Arrays.copyOf(salt, salt.length);
     }
 
     public Date getCreatedAt() {
