@@ -24,6 +24,20 @@ public class PasswordEntry implements Serializable {
         this.lastAccessedAt = currentDate;
     }
 
+    /**
+     * Updates the last accessed timestamp to the current date.
+     */
+    public void updateLastAccessedAt() {
+        this.lastAccessedAt = new Date();
+    }
+
+    /**
+     * Updates the updated timestamp to the current date.
+    */
+    public void updateUpdatedAt() {
+        this.updatedAt = new Date();
+    }
+
     // Getters and setters
     
     public String getServiceName() {

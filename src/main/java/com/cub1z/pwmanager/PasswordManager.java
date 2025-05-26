@@ -1,5 +1,6 @@
 package com.cub1z.pwmanager;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import com.cub1z.pwmanager.config.Constants;
@@ -10,7 +11,7 @@ public class PasswordManager {
     private final CryptoService cryptoService;
     private final PasswordEntryService passwordEntryService;
 
-    private PasswordManager(CryptoService cryptoService, PasswordEntryService passwordEntryService) {
+    public PasswordManager(CryptoService cryptoService, PasswordEntryService passwordEntryService) {
         this.cryptoService = cryptoService;
         this.passwordEntryService = passwordEntryService;
     }
@@ -49,4 +50,25 @@ public class PasswordManager {
         }
     }
 
+    public String get(
+        String serviceName, String masterPwd
+    ) throws IllegalArgumentException, RuntimeException, GeneralSecurityException {
+        try {
+            byte[] entry = this.passwordEntryService.getEntry(serviceName).getEncryptedPassword();
+            char[] masterPassword = masterPwd.toCharArray();
+
+            char[] decryptedPassword = this.cryptoService.decrypt(entry, masterPassword);
+            this.passwordEntryService.updateLastAccessedAt(serviceName);
+
+            return new String(decryptedPassword);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid service name: " + e.getMessage(), e);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Error during decryption", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Error updating last accessed timestamp", e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Error retrieving password entry", e);
+        }
+    }
 }

@@ -40,4 +40,8 @@ public class PasswordEntryService {
     public PasswordEntry getEntry(String serviceName) throws IllegalArgumentException {
         return this.repository.getEntry(serviceName);
     }
+
+    public void updateLastAccessedAt(String serviceName) throws IllegalArgumentException, IOException {
+        this.repository.updateLastAccessedAt(serviceName);
+    }
 }

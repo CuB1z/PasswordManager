@@ -52,7 +52,7 @@ public class PasswordEntryRepository {
         entries.put(entry.getServiceName(), entry);
 
         // Write the updated entries to file
-        FileUtils.<HashMap<String, PasswordEntry>>writeObjectToFile(filePath, entries);
+        this.writeEntries();
     }
 
     public void saveEntry(PasswordEntry entry) throws Exception {
@@ -73,6 +73,23 @@ public class PasswordEntryRepository {
         return entries.get(serviceName);
     }
 
+    public void updateLastAccessedAt(String serviceName) throws IllegalArgumentException, IOException {
+        if (serviceName == null || serviceName.isEmpty()) {
+            throw new IllegalArgumentException("Service name cannot be null or empty");
+        }
+
+        PasswordEntry entry = entries.get(serviceName);
+        if (entry == null) {
+            throw new IllegalArgumentException("No entry found for the given service name");
+        }
+
+        // Update the last accessed timestamp
+        entry.updateLastAccessedAt();
+        
+        // Write the updated entries to file
+        this.writeEntries();
+    }
+
     // Private methods
 
     @SuppressWarnings("unchecked")
@@ -80,5 +97,9 @@ public class PasswordEntryRepository {
         return FileUtils.readObjectFromFile(filePath, HashMap.class)
                 .map(map -> (HashMap<String, PasswordEntry>) map)
                 .orElseThrow(() -> new FileNotFoundException("Password file not found"));
+    }
+
+    private void writeEntries() throws IOException {
+        FileUtils.<HashMap<String, PasswordEntry>>writeObjectToFile(filePath, entries);
     }
 }
