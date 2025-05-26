@@ -8,12 +8,12 @@ public class PasswordEntry implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String serviceName;
-    private final char[] encryptedPassword;
+    private final byte[] encryptedPassword;
     private final Date createdAt;
     private Date updatedAt;
     private Date lastAccessedAt;
 
-    public PasswordEntry(String serviceName, char[] encryptedPassword, byte[] salt) {
+    public PasswordEntry(String serviceName, byte[] encryptedPassword) {
         this.serviceName = serviceName;
         this.encryptedPassword = encryptedPassword;
 
@@ -30,7 +30,7 @@ public class PasswordEntry implements Serializable {
         return serviceName;
     }
 
-    public char[] getEncryptedPassword() {
+    public byte[] getEncryptedPassword() {
         return Arrays.copyOf(encryptedPassword, encryptedPassword.length);
     }
 

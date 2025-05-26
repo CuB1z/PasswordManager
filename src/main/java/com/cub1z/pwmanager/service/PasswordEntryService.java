@@ -25,8 +25,8 @@ public class PasswordEntryService {
      * @throws IllegalArgumentException If the entry is null, has an empty service name, or if an entry with the same service name already exists and overwrite is false.
      * @throws IOException If there is an error writing to the file.
     */
-    public void saveEntry(String serviceName, char[] encryptedPassword, byte[] salt, boolean overwrite) throws IllegalArgumentException, IOException {
-        PasswordEntry entry = new PasswordEntry(serviceName, encryptedPassword, salt);
+    public void saveEntry(String serviceName, byte[] encryptedPassword, boolean overwrite) throws IllegalArgumentException, IOException {
+        PasswordEntry entry = new PasswordEntry(serviceName, encryptedPassword);
         this.repository.saveEntry(entry, overwrite);
     }
 
