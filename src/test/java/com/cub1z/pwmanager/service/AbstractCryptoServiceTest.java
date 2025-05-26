@@ -58,4 +58,44 @@ public abstract class AbstractCryptoServiceTest {
         // Should not be equal (due to random salt and IV)
         assertFalse(Arrays.equals(encrypted1, encrypted2));
     }
+
+    @Test
+void testGenerateSecurePassword() throws Exception {
+    CryptoService service = getCryptoService();
+
+    int length = 16;
+    boolean includeSpecialChars = true;
+
+    char[] password = service.generateSecurePassword(length, includeSpecialChars);
+    
+    try {
+        assertNotNull(password);
+        assertEquals(length, password.length);
+
+        // Check password complexity
+        boolean hasLower = false;
+        boolean hasUpper = false;
+        boolean hasDigit = false;
+        boolean hasSpecial = false;
+        String specialChars = "!@#$%^&*()-_=+[]{}|;:',.<>?/";
+
+        for (char c : password) {
+            if (Character.isLowerCase(c)) hasLower = true;
+            if (Character.isUpperCase(c)) hasUpper = true;
+            if (Character.isDigit(c)) hasDigit = true;
+            if (specialChars.indexOf(c) >= 0) hasSpecial = true;
+        }
+
+        assertTrue(hasLower, "Password should contain lowercase letters");
+        assertTrue(hasUpper, "Password should contain uppercase letters");
+        assertTrue(hasDigit, "Password should contain digits");
+        
+        if (includeSpecialChars) {
+            assertTrue(hasSpecial, "Password should contain special characters");
+        }
+    } finally {
+        // Cleanup
+        Arrays.fill(password, '\0');
+    }
+}
 }

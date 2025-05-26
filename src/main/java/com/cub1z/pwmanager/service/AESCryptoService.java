@@ -83,6 +83,24 @@ public class AESCryptoService implements CryptoService {
         return plainChars;
     }
 
+    @Override
+    public char[] generateSecurePassword(int length, boolean includeSpecialChars) throws GeneralSecurityException {
+        if (length <= 0) {
+            throw new IllegalArgumentException("Password length must be positive");
+        }
+
+        StringBuilder password = new StringBuilder(length);
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        if (includeSpecialChars)  characters += "!@#$%^&*()-_=+[]{}|;:',.<>?/";
+
+        for (int i = 0; i < length; i++) {
+            int index = secureRandom.nextInt(characters.length());
+            password.append(characters.charAt(index));
+        }
+
+        return password.toString().toCharArray();
+    }
+
     // Auxiliary methods
 
     private SecretKey deriveKey(char[] password, byte[] salt) throws GeneralSecurityException {
