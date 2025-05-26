@@ -41,6 +41,24 @@ public class PasswordEntryService {
         return this.repository.getEntry(serviceName);
     }
 
+    /**
+     * Deletes a password entry by its service name.
+     *
+     * @param serviceName The name of the service for which the password entry is to be deleted.
+     * @throws IllegalArgumentException If the service name is null or empty.
+     * @throws IOException If there is an error writing to the file.
+    */
+    public void deleteEntry(String serviceName) throws IllegalArgumentException, IOException {
+        this.repository.deleteEntry(serviceName);
+    }
+
+    /**
+     * Updates the last accessed timestamp of a password entry.
+     *
+     * @param serviceName The name of the service for which the last accessed timestamp is to be updated.
+     * @throws IllegalArgumentException If the service name is null or empty.
+     * @throws IOException If there is an error writing to the file.
+    */
     public void updateLastAccessedAt(String serviceName) throws IllegalArgumentException, IOException {
         this.repository.updateLastAccessedAt(serviceName);
     }

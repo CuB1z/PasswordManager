@@ -73,6 +73,29 @@ public class PasswordEntryRepository {
         return entries.get(serviceName);
     }
 
+    /**
+     * Deletes a password entry by its service name.
+     * 
+     * @param serviceName The name of the service for which the password entry is to be deleted.
+     * @throws IllegalArgumentException If the service name is null or empty.
+     * @throws IOException If there is an error writing to the file.
+    */
+    public void deleteEntry(String serviceName) throws IllegalArgumentException, IOException {
+        if (serviceName == null || serviceName.isEmpty()) {
+            throw new IllegalArgumentException("Service name cannot be null or empty");
+        }
+
+        if (!entries.containsKey(serviceName)) {
+            throw new IllegalArgumentException("No entry found for the given service name");
+        }
+
+        // Remove the entry
+        entries.remove(serviceName);
+
+        // Write the updated entries to file
+        this.writeEntries();
+    }
+
     public void updateLastAccessedAt(String serviceName) throws IllegalArgumentException, IOException {
         if (serviceName == null || serviceName.isEmpty()) {
             throw new IllegalArgumentException("Service name cannot be null or empty");
