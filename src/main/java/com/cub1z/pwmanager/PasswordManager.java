@@ -6,15 +6,72 @@ import java.security.GeneralSecurityException;
 import com.cub1z.pwmanager.config.Constants;
 import com.cub1z.pwmanager.model.PasswordEntry;
 import com.cub1z.pwmanager.service.CryptoService;
+import com.cub1z.pwmanager.service.MasterPasswordService;
 import com.cub1z.pwmanager.service.PasswordEntryService;
 
 public class PasswordManager {
     private final CryptoService cryptoService;
     private final PasswordEntryService passwordEntryService;
+    private final MasterPasswordService masterPasswordService;
 
-    public PasswordManager(CryptoService cryptoService, PasswordEntryService passwordEntryService) {
+    public PasswordManager(
+        CryptoService cryptoService,
+        PasswordEntryService passwordEntryService,
+        MasterPasswordService masterPasswordService
+    ) {
         this.cryptoService = cryptoService;
         this.passwordEntryService = passwordEntryService;
+        this.masterPasswordService = masterPasswordService;
+    }
+
+    /**
+     * Checks if a master password exists.
+     * 
+     * @return true if a master password exists, false otherwise.
+     */
+    public boolean doesMasterPasswordExist() {
+        return this.masterPasswordService.doesMasterPasswordExist();
+    }
+
+    /**
+     * Checks if the user is authenticated.
+     * 
+     * @return true if the user is authenticated, false otherwise.
+     */
+    public boolean isAuthenticated() {
+        return this.masterPasswordService.isAuthenticated();
+    }
+
+    /**
+     * Authenticates the user with the provided master password.
+     * 
+     * @param masterPassword The master password to authenticate.
+     * @return true if authentication is successful, false otherwise.
+     */
+    public boolean authenticate(String masterPassword) {
+        try {
+            String hashedPassword = this.cryptoService.hashPassword(masterPassword.toCharArray());
+            return this.masterPasswordService.authenticate(hashedPassword);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Error hashing master password", e);
+        }
+    }
+
+    /**
+     * Saves the master password after hashing it.
+     * 
+     * @param masterPassword The master password to be saved.
+     * @throws RuntimeException If there is an error during hashing or saving the master password.
+     */
+    public void saveMasterPassword(String masterPassword) {
+        try {
+            String hashedPassword = this.cryptoService.hashPassword(masterPassword.toCharArray());
+            this.masterPasswordService.saveMasterPassword(hashedPassword);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Error hashing master password", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Error saving master password", e);
+        }
     }
 
     /**
