@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import com.cub1z.pwmanager.config.PwdFilePath;
+import com.cub1z.pwmanager.config.FilePath;
 import com.cub1z.pwmanager.model.PasswordEntry;
 import com.cub1z.pwmanager.utils.FileUtils;
 
-public class PasswordEntryRepository {
+public class PasswordEntryRepository implements Repository {
     private final Path filePath;
     private HashMap<String, PasswordEntry> entries;
     
@@ -19,14 +19,14 @@ public class PasswordEntryRepository {
 
         // Load existing entries from file if it exists
         try {
-            this.entries = loadEntries();
+            load();
         } catch (Exception e) {
             this.entries = new HashMap<>();
         }
     }
 
     public PasswordEntryRepository() {
-        this(PwdFilePath.getDefault());
+        this(FilePath.getPasswordsDefault());
     }
 
     /**
@@ -52,7 +52,7 @@ public class PasswordEntryRepository {
         entries.put(entry.getServiceName(), entry);
 
         // Write the updated entries to file
-        this.writeEntries();
+        this.save();
     }
 
     public void saveEntry(PasswordEntry entry) throws Exception {
@@ -93,7 +93,7 @@ public class PasswordEntryRepository {
         entries.remove(serviceName);
 
         // Write the updated entries to file
-        this.writeEntries();
+        this.save();
     }
 
     public void updateLastAccessedAt(String serviceName) throws IllegalArgumentException, IOException {
@@ -110,19 +110,21 @@ public class PasswordEntryRepository {
         entry.updateLastAccessedAt();
         
         // Write the updated entries to file
-        this.writeEntries();
+        this.save();
     }
 
-    // Private methods
-
+    // Overrides for Repository interface
+    
+    @Override
     @SuppressWarnings("unchecked")
-    private HashMap<String, PasswordEntry> loadEntries() throws Exception {
-        return FileUtils.readObjectFromFile(filePath, HashMap.class)
-                .map(map -> (HashMap<String, PasswordEntry>) map)
-                .orElseThrow(() -> new FileNotFoundException("Password file not found"));
+    public void load() throws Exception {
+        this.entries = FileUtils.readObjectFromFile(this.filePath, HashMap.class)
+            .map(map -> (HashMap<String, PasswordEntry>) map)
+            .orElseThrow(() -> new FileNotFoundException("Password file not found"));
     }
 
-    private void writeEntries() throws IOException {
-        FileUtils.<HashMap<String, PasswordEntry>>writeObjectToFile(filePath, entries);
+    @Override
+    public void save() throws IOException {
+        FileUtils.<HashMap<String, PasswordEntry>>writeObjectToFile(this.filePath, this.entries);
     }
 }
