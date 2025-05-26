@@ -101,6 +101,21 @@ public class AESCryptoService implements CryptoService {
         return password.toString().toCharArray();
     }
 
+    @Override
+    public String hashPassword(char[] password) throws GeneralSecurityException {
+        if (password == null || password.length == 0) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(new String(password).getBytes(StandardCharsets.UTF_8));
+
+        // Clean up sensitive data
+        wipeSensitiveData(password);
+
+        return bytesToHex(hash);
+    }
+
     // Auxiliary methods
 
     private SecretKey deriveKey(char[] password, byte[] salt) throws GeneralSecurityException {
@@ -120,5 +135,13 @@ public class AESCryptoService implements CryptoService {
 
     private void wipeSensitiveData(byte[] data) {
         if (data != null) Arrays.fill(data, (byte) 0);
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 }
