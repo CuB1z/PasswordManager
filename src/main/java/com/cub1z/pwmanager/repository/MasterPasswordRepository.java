@@ -15,6 +15,12 @@ public class MasterPasswordRepository implements Repository {
     public MasterPasswordRepository(Path filePath) {
         if (filePath == null) throw new IllegalArgumentException("File path cannot be null");
         this.filePath = filePath;
+        
+        try {
+            this.load();
+        } catch (Exception e) {
+            this.masterPassword = null;
+        }
     }
 
     public MasterPasswordRepository() {
