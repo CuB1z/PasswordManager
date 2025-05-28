@@ -2,6 +2,7 @@ package com.cub1z.pwmanager.service;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 import com.cub1z.pwmanager.model.PasswordEntry;
 import com.cub1z.pwmanager.repository.PasswordEntryRepository;
@@ -53,6 +54,16 @@ public class PasswordEntryService {
     }
 
     /**
+     * Lists all stored password entries.
+     *
+     * @return An array of PasswordEntry objects representing all stored passwords.
+     * @throws IOException If there is an error reading from the file.
+    */
+    public List<PasswordEntry> getAllEntries() throws IOException {
+        return this.repository.getAllEntries();
+    }
+
+    /**
      * Updates the last accessed timestamp of a password entry.
      *
      * @param serviceName The name of the service for which the last accessed timestamp is to be updated.
@@ -61,5 +72,14 @@ public class PasswordEntryService {
     */
     public void updateLastAccessedAt(String serviceName) throws IllegalArgumentException, IOException {
         this.repository.updateLastAccessedAt(serviceName);
+    }
+
+    /**
+     * Retrieves the count of stored password entries.
+     *
+     * @return The number of stored password entries.
+    */
+    public int getStoredPasswordCount() {
+        return this.repository.count();
     }
 }

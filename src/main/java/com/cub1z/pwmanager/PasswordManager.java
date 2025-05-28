@@ -2,6 +2,7 @@ package com.cub1z.pwmanager;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 import com.cub1z.pwmanager.config.Constants;
 import com.cub1z.pwmanager.model.PasswordEntry;
@@ -72,6 +73,10 @@ public class PasswordManager {
         } catch (IOException e) {
             throw new RuntimeException("Error saving master password", e);
         }
+    }
+
+    public int getSavedPasswordCount() {
+        return this.passwordEntryService.getStoredPasswordCount();
     }
 
     /**
@@ -192,6 +197,20 @@ public class PasswordManager {
             throw new RuntimeException("Error verifying master password", e);
         } catch (IOException e) {
             throw new RuntimeException("Error during deletion process", e);
+        }
+    }
+
+    /**
+     * Retrieves all password entries.
+     * 
+     * @return A list of all PasswordEntry objects.
+     * @throws IOException If there is an error reading from the file.
+     */
+    public List<PasswordEntry> getAllEntries() throws IOException{
+        try {
+            return this.passwordEntryService.getAllEntries();
+        } catch (IOException e) {
+            throw new IOException("Error retrieving all password entries", e);
         }
     }
 }

@@ -3,7 +3,9 @@ package com.cub1z.pwmanager.repository;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.cub1z.pwmanager.config.FilePath;
 import com.cub1z.pwmanager.model.PasswordEntry;
@@ -111,6 +113,14 @@ public class PasswordEntryRepository implements Repository {
         
         // Write the updated entries to file
         this.save();
+    }
+
+    public List<PasswordEntry> getAllEntries() throws IOException {
+        return new ArrayList<>(entries.values());
+    }
+
+    public int count() {
+        return entries.size();
     }
 
     // Overrides for Repository interface

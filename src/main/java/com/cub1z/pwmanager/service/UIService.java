@@ -1,30 +1,48 @@
 package com.cub1z.pwmanager.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import com.cub1z.pwmanager.model.PasswordEntry;
+
 public class UIService {
     private static final String LOGO = """
-            ╔═══════════════════╗
-            ║     PwManager     ║
-            ╚═══════════════════╝
+            ███╗   ███╗██╗   ██╗██████╗  █████╗ ███████╗███████╗
+            ████╗ ████║╚██╗ ██╔╝██╔══██╗██╔══██╗██╔════╝██╔════╝
+            ██╔████╔██║ ╚████╔╝ ██████╔╝███████║███████╗███████╗
+            ██║╚██╔╝██║  ╚██╔╝  ██╔═══╝ ██╔══██║╚════██║╚════██║
+            ██║ ╚═╝ ██║   ██║   ██║     ██║  ██║███████║███████║
+            ╚═╝     ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝
             """;
 
     private static final String MENU = """
             ╔══════════════════════════════════════════════════════════════════════════╗
-            ║                           Password Manager v1.0                          ║
+            ║                        Password Manager v1.0 - MyPass                    ║
             ╠══════════════════════════════════════════════════════════════════════════╣
             ║                                                                          ║
-            ║   [1] Add New Password          - Store a new password for a service     ║
-            ║   [2] Get Password              - Retrieve a stored password             ║
-            ║   [3] Delete Password           - Remove a stored password               ║
-            ║   [4] Exit                      - Close the application                  ║
+            ║   [1] (#) List Passwords       - Show all stored services                ║
+            ║   [2] (?) Get Password         - Retrieve a stored password              ║
+            ║   [3] (+) Add New Password     - Store a new password for a service      ║
+            ║   [4] (-) Delete Password      - Remove a stored password                ║
+            ║   [5] (x) Exit                 - Close the application                   ║
             ║                                                                          ║
-            ║                                                                          ║
-            ║   Current time: %s                                                 ║
-            ║   Stored passwords: %d                                                    ║
+            ║   (*) Last access: %s                                   ║
+            ║   (/) Stored passwords: %d                                                ║
             ║                                                                          ║
             ╚══════════════════════════════════════════════════════════════════════════╝
             """;
-    
+
+    private static final String PASSWORD_LIST_TEMPLATE = """
+            ╔══════════════════════════════════════════════════════════════════════════╗
+            ║                            Stored Passwords                              ║
+            ╠══════════════════════════════════════════════════════════════════════════╣
+            %s
+            ╚══════════════════════════════════════════════════════════════════════════╝
+            """;
+
     public static void showLogo() {
+        clearScreen();
         System.out.println(LOGO);
     }
 
@@ -33,13 +51,34 @@ public class UIService {
         centerString(LOGO);
         System.out.println();
         String formattedMenu = String.format(MENU, 
-            java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss")),
+            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
             storedPasswords
         );
         System.out.println(formattedMenu);
     }
 
-    private static void clearScreen() {
+    public static void showPasswordList(List<PasswordEntry> entries) {
+        clearScreen();
+        StringBuilder serviceList = new StringBuilder();
+
+        if (entries.isEmpty()) {
+            serviceList.append("║                      No passwords stored yet                           ║\n");
+        } else {
+            for (int i = 0; i < entries.size(); i++) {
+                String service = entries.get(i).getServiceName();
+                serviceList.append(String.format("║  %2d. %-67s ║", (i + 1), service));
+                if (i < entries.size() - 1) {
+                    serviceList.append("\n");
+                }
+            }
+        }
+        
+        System.out.println(String.format(PASSWORD_LIST_TEMPLATE, serviceList.toString()));
+        System.out.println("Press Enter to continue...");
+        readInput("");
+    }
+
+    public static void clearScreen() {
         try {
             new ProcessBuilder("cmd", "/c", "mode con: cols=80 lines=30").inheritIO().start().waitFor();
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
@@ -75,11 +114,14 @@ public class UIService {
     }
 
     public static void showError(String message) {
-        System.out.println(String.format("Error: %s", message));
-        System.out.println("Try again...\n");
+        if (message == null || message.isEmpty()) return;
+        System.out.println(String.format("(!) %s \n", message));
+        message = "";
     }
 
     public static void showSuccess(String message) {
-        System.out.println(String.format("\nSuccess: %s", message));
+        if (message == null || message.isEmpty()) return;
+        System.out.println(String.format("(+) %s \n", message));
+        message = "";
     }
 }
