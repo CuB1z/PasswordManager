@@ -75,7 +75,7 @@ public class AESCryptoService implements CryptoService {
 
         byte[] plainBytes = cipher.doFinal(cipherText);
         char[] plainChars = new String(plainBytes, StandardCharsets.UTF_8).toCharArray();
-        
+
         // Clean up sensitive data
         wipeSensitiveData(plainBytes);
         wipeSensitiveData(password);
@@ -89,16 +89,37 @@ public class AESCryptoService implements CryptoService {
             throw new IllegalArgumentException("Password length must be positive");
         }
 
-        StringBuilder password = new StringBuilder(length);
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        if (includeSpecialChars)  characters += "!@#$%^&*()-_=+[]{}|;:',.<>?/";
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String specials = "!@#$%^&*()-_=+[]{}|;:',.<>?/";
+        String all = upper + lower + digits + (includeSpecialChars ? specials : "");
 
-        for (int i = 0; i < length; i++) {
-            int index = secureRandom.nextInt(characters.length());
-            password.append(characters.charAt(index));
+        StringBuilder password = new StringBuilder(length);
+
+        // Ensure at least one character from each required set
+        password.append(upper.charAt(secureRandom.nextInt(upper.length())));
+        password.append(lower.charAt(secureRandom.nextInt(lower.length())));
+        password.append(digits.charAt(secureRandom.nextInt(digits.length())));
+        if (includeSpecialChars && length > 3) {
+            password.append(specials.charAt(secureRandom.nextInt(specials.length())));
         }
 
-        return password.toString().toCharArray();
+        // Fill the rest randomly
+        for (int i = password.length(); i < length; i++) {
+            password.append(all.charAt(secureRandom.nextInt(all.length())));
+        }
+
+        // Shuffle to avoid predictable positions
+        char[] pwdArr = password.toString().toCharArray();
+        for (int i = pwdArr.length - 1; i > 0; i--) {
+            int j = secureRandom.nextInt(i + 1);
+            char tmp = pwdArr[i];
+            pwdArr[i] = pwdArr[j];
+            pwdArr[j] = tmp;
+        }
+
+        return pwdArr;
     }
 
     @Override
@@ -130,11 +151,13 @@ public class AESCryptoService implements CryptoService {
     }
 
     private void wipeSensitiveData(char[] data) {
-        if (data != null) Arrays.fill(data, '\0');
+        if (data != null)
+            Arrays.fill(data, '\0');
     }
 
     private void wipeSensitiveData(byte[] data) {
-        if (data != null) Arrays.fill(data, (byte) 0);
+        if (data != null)
+            Arrays.fill(data, (byte) 0);
     }
 
     private String bytesToHex(byte[] bytes) {

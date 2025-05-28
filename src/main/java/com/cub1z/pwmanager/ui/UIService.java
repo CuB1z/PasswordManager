@@ -81,7 +81,7 @@ public class UIService {
     public static void showPassword(String serviceName, String password) {
         clearScreen();
         String title = String.format("Password for '%s'", serviceName);
-        String[] lines = { password };
+        String[] lines = { String.format(">> %s", password) };
         ConsoleBox.printBox(title, lines, SCREEN_WIDTH);
         promptContinue();
     }
