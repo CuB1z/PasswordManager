@@ -19,7 +19,7 @@ echo "==================================="
 
 # Clean and build with tests
 echo "Running clean build with tests..."
-mvn clean test package
+"$PROJECT_DIR/mvnw" clean test package
 
 # Check if JAR was created
 if [[ ! -f "$JAR_PATH" ]]; then
@@ -30,9 +30,20 @@ fi
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"
 
+# Remove existing JAR in output directory if it exists
+if [[ -f "$OUTPUT_DIR/$JAR_NAME" ]]; then
+    rm -f "$OUTPUT_DIR/$JAR_NAME"
+fi
+
 # Copy JAR to output directory
 echo "Copying JAR to output directory..."
 cp -f "$JAR_PATH" "$OUTPUT_DIR/$JAR_NAME"
+
+# Zip all contents of OUTPUT_DIR
+echo "Creating zip archive of output directory..."
+cd "$OUTPUT_DIR"
+zip -r pwmanager.zip ./*
+cd "$PROJECT_DIR"
 
 echo "==================================="
 echo "Build successful!"
